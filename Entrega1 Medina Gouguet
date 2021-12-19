@@ -1,3 +1,23 @@
 CREATE DATABASE 'NuestraEscuela';
 
 USE 'NuestraEscuela';
+
+CREATE TABLE 'Tabla1' (
+	'TituloColumna1' CHAR(3) NOT NULL DEFAULT '',
+	'TituloColumna2' CHAR(52) NOT NULL DEFAULT '',
+	'TituloColumna3' ENUM('MANANA','TARDE') NOT NULL DEFAULT 'MANANA',
+	PRIMARY KEY ('TituloColumna1'),
+);
+
+CREATE TABLE 'Tabla2' (
+	'TituloColumnaA' CHAR(5) NOT NULL DEFAULT '',
+	'TituloColumnaB' CHAR(5) NOT NULL DEFAULT '',
+	'TituloColumnaC' CHAR(3) NOT NULL DEFAULT '',
+	PRIMARY KEY ('TituloColumnaA'),
+	KEY 'TituloColumnaC',
+	CONSTRAINT 'Tabla2_ibfk_1' FOREIGN KEY ('TituloColumnaC') REFERENCES 'TituloColumna1'('NombreTabla1')
+);
+
+INSERT INTO 'Tabla1' VALUES ('001','JUAN PEREZ','MANANA');
+INSERT INTO 'Tabla1' VALUES ('002','BRENDA ASNICAR','MANANA');
+INSERT INTO 'Tabla1' VALUES ('003','MARIA BECERRA','TARDE');
