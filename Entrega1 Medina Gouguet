@@ -1,23 +1,109 @@
-CREATE DATABASE 'NuestraEscuela';
+CREATE DATABASE `NuestraEscuela`;
 
-USE 'NuestraEscuela';
+USE `NuestraEscuela`;
 
-CREATE TABLE 'Tabla1' (
-	'TituloColumna1' CHAR(3) NOT NULL DEFAULT '',
-	'TituloColumna2' CHAR(52) NOT NULL DEFAULT '',
-	'TituloColumna3' ENUM('MANANA','TARDE') NOT NULL DEFAULT 'MANANA',
-	PRIMARY KEY ('TituloColumna1'),
+CREATE TABLE `Docentes` (
+	`id_docente` SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`nombres_docente` VARCHAR(45) NOT NULL DEFAULT '',
+	`apellidos_docente` VARCHAR(45) NOT NULL DEFAULT '',
+    `dni_docente` SMALLINT NOT NULL,
+	PRIMARY KEY (`id_docente`)
 );
 
-CREATE TABLE 'Tabla2' (
-	'TituloColumnaA' CHAR(5) NOT NULL DEFAULT '',
-	'TituloColumnaB' CHAR(5) NOT NULL DEFAULT '',
-	'TituloColumnaC' CHAR(3) NOT NULL DEFAULT '',
-	PRIMARY KEY ('TituloColumnaA'),
-	KEY 'TituloColumnaC',
-	CONSTRAINT 'Tabla2_ibfk_1' FOREIGN KEY ('TituloColumnaC') REFERENCES 'TituloColumna1'('NombreTabla1')
+CREATE TABLE `Grados` (
+	`id_grado` VARCHAR(10) NOT NULL DEFAULT '',
+	PRIMARY KEY (`id_grado`)
 );
 
-INSERT INTO 'Tabla1' VALUES ('001','JUAN PEREZ','MANANA');
-INSERT INTO 'Tabla1' VALUES ('002','BRENDA ASNICAR','MANANA');
-INSERT INTO 'Tabla1' VALUES ('003','MARIA BECERRA','TARDE');
+CREATE TABLE `Turnos` (
+	`id_turno` varchar(10) NOT NULL DEFAULT '',
+	PRIMARY KEY (`id_turno`)
+);
+
+CREATE TABLE `Division` (
+	`id_division` varchar(2) NOT NULL DEFAULT '',
+	PRIMARY KEY (`id_division`)
+);
+
+CREATE TABLE `InstanciasEvaluacion` (
+	`id_instanciaeval` varchar(20) NOT NULL DEFAULT '',
+	PRIMARY KEY (`id_instanciaeval`)
+);
+
+CREATE TABLE `Asignaturas` (
+	`id_asignatura` varchar(45) NOT NULL DEFAULT '',
+	PRIMARY KEY (`id_asignatura`)
+);
+
+CREATE TABLE `Cursos` (
+    `id_curso` SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `id_grado` VARCHAR(10) NOT NULL DEFAULT '',
+    `id_division` VARCHAR(10) NOT NULL DEFAULT '',
+    `aniolectivo` YEAR DEFAULT('1901'),
+    `id_turno` varchar(10) NOT NULL DEFAULT '',
+    PRIMARY KEY (id_curso),
+	CONSTRAINT `cursos_ibfk_1` FOREIGN KEY (`id_grado`) REFERENCES `Grados`(`id_grado`),
+    CONSTRAINT `cursos_ibfk_2` FOREIGN KEY (`id_turno`) REFERENCES `Turnos`(`id_turno`),
+    CONSTRAINT `cursos_ibfk_3` FOREIGN KEY (`id_division`) REFERENCES `Division`(`id_division`)
+    );
+    
+CREATE TABLE `Alumnos` (
+    `id_alumno` SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `nombres_alumno` VARCHAR(45) NOT NULL DEFAULT '',
+    `apellidos_alumno` VARCHAR(45) NOT NULL DEFAULT '',
+    `dni_alumno` VARCHAR(15) NOT NULL DEFAULT '',
+    `fecha_nac_alumno` DATE,
+    `contacto_emerg` VARCHAR(50) NOT NULL DEFAULT '',
+    `datos_medicos` VARCHAR(50) NOT NULL DEFAULT '',
+    `curso` VARCHAR(10) NOT NULL DEFAULT '',
+    `id_curso` SMALLINT UNSIGNED NOT NULL,
+    PRIMARY KEY (`id_alumno`),
+    CONSTRAINT `alumnos_ibfk_1` FOREIGN KEY (`id_curso`) REFERENCES `Cursos`(`id_curso`)
+);
+
+CREATE TABLE `AsignaturasPorCurso` (
+	`id_asign_curso` SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`id_asignatura` varchar(45) NOT NULL DEFAULT '',
+    `id_docente` SMALLINT UNSIGNED NOT NULL,
+    `id_curso` SMALLINT UNSIGNED NOT NULL,
+    PRIMARY KEY (`id_asign_curso`),
+    CONSTRAINT `asigncurso_ibfk_1` FOREIGN KEY (`id_curso`) REFERENCES `Cursos`(`id_curso`),
+	CONSTRAINT `asigncurso_ibfk_2` FOREIGN KEY (`id_asignatura`) REFERENCES `Asignaturas`(`id_asignatura`),
+	CONSTRAINT `asigncurso_ibfk_3` FOREIGN KEY (`id_docente`) REFERENCES `Docentes`(`id_docente`)
+);
+
+CREATE TABLE `AsignaturasPorDocente` (
+	`id_asign_docente` SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `id_docente` SMALLINT UNSIGNED NOT NULL,
+    `id_asignatura` varchar(45) NOT NULL DEFAULT '',
+    PRIMARY KEY (`id_asign_docente`),
+    CONSTRAINT `asigndocente_ibfk_1` FOREIGN KEY (`id_asignatura`) REFERENCES `Asignaturas`(`id_asignatura`),
+	CONSTRAINT `asigndocente_ibfk_2` FOREIGN KEY (`id_docente`) REFERENCES `Docentes`(`id_docente`)
+);
+
+CREATE TABLE `Aulas` (
+	`id_aula` SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `aula` VARCHAR(15) NOT NULL DEFAULT '',
+	`id_curso_manana` SMALLINT UNSIGNED NOT NULL,
+    `id_curso_tarde` SMALLINT UNSIGNED NOT NULL,
+    PRIMARY KEY (`id_aula`),
+    CONSTRAINT `aulas_ibfk_1` FOREIGN KEY (`id_curso_manana`) REFERENCES `Cursos`(`id_curso`),
+    CONSTRAINT `aulas_ibfk_2` FOREIGN KEY (`id_curso_tarde`) REFERENCES `Cursos`(`id_curso`)
+);
+
+CREATE TABLE `Calificaciones` (
+	`id_calificacion` MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`id_alumno` SMALLINT UNSIGNED NOT NULL,
+    `id_docente` SMALLINT UNSIGNED NOT NULL,
+    `id_asignatura` varchar(45) NOT NULL DEFAULT '',
+    `id_curso` SMALLINT UNSIGNED NOT NULL,
+    `id_instanciaeval` varchar(20) NOT NULL DEFAULT '',
+    `calificacion` ENUM('1','2','3','4','5','6','7','8','9','10','') DEFAULT '',
+    `comentario` VARCHAR(255) NOT NULL DEFAULT '',
+    PRIMARY KEY (`id_calificacion`),
+    CONSTRAINT `calificaciones_ibfk_1` FOREIGN KEY (`id_alumno`) REFERENCES `Alumnos`(`id_alumno`),
+    CONSTRAINT `calificaciones_ibfk_2` FOREIGN KEY (`id_docente`) REFERENCES `Docentes`(`id_docente`),
+    CONSTRAINT `calificaciones_ibfk_3` FOREIGN KEY (`id_asignatura`) REFERENCES `Asignaturas`(`id_asignatura`),
+    CONSTRAINT `calificaciones_ibfk_4` FOREIGN KEY (`id_curso`) REFERENCES `Cursos`(`id_curso`),
+    CONSTRAINT `calificaciones_ibfk_5` FOREIGN KEY (`id_instanciaeval`) REFERENCES `InstanciasEvaluacion`(`id_instanciaeval`)
+);
